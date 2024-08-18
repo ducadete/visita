@@ -63,57 +63,55 @@
  <!-- Adicionando o Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js"></script>
-    
     <script>
-         const firebaseConfig = {
-            apiKey: "AIzaSyCxMQnsd8YvXyn3DH21gAzTjRXfp0gAvhA",
-            authDomain: "visita-domiciliar-6866a.firebaseapp.com",
-            projectId: "visita-domiciliar-6866a",
-            storageBucket: "visita-domiciliar-6866a.appspot.com",
-            messagingSenderId: "1096961063614",
-            appId: "1:1096961063614:web:852bf1c2e8b329c8cd3cef",
-            measurementId: "G-SRCJH2TZ3R"
-        };
+        document.addEventListener('DOMContentLoaded', function () {
+            // Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyCxMQnsd8YvXyn3DH21gAzTjRXfp0gAvhA",
+                authDomain: "visita-domiciliar-6866a.firebaseapp.com",
+                projectId: "visita-domiciliar-6866a",
+                storageBucket: "visita-domiciliar-6866a.appspot.com",
+                messagingSenderId: "1096961063614",
+                appId: "1:1096961063614:web:852bf1c2e8b329c8cd3cef",
+                measurementId: "G-SRCJH2TZ3R"
+            };
 
-        // Inicialize o Firebase
-        const app = firebase.initializeApp(firebaseConfig);
+            // Initialize Firebase
+            const app = firebase.initializeApp(firebaseConfig);
 
-        // Inicialize o Firestore
-        const db = firebase.firestore();
+            // Initialize Firestore
+            const db = firebase.firestore();
 
-        // Defina sua função saveData aqui
-        function saveData() {
-            const dataVisita = document.getElementById("data-visita").value;
-            const nome = document.getElementById("nome").value;
-            const dataNascimento = document.getElementById("data-nascimento").value;
-            const dataUltimaVisita = document.getElementById("data-ultima-visita").value;
-            const doencas = [];
-            document.querySelectorAll('input[name="doencas"]:checked').forEach((checkbox) => {
-                doencas.push(checkbox.nextElementSibling.innerText);
-            });
-            const complicacoes = [];
-            document.querySelectorAll('input[name="complicacoes"]:checked').forEach((checkbox) => {
-                complicacoes.push(checkbox.nextElementSibling.innerText);
-            });
+            window.saveData = function() {
+                const dataVisita = document.getElementById("data-visita").value;
+                const nome = document.getElementById("nome").value;
+                const dataNascimento = document.getElementById("data-nascimento").value;
+                const dataUltimaVisita = document.getElementById("data-ultima-visita").value;
+                const doencas = [];
+                document.querySelectorAll('input[name="doencas"]:checked').forEach((checkbox) => {
+                    doencas.push(checkbox.nextElementSibling.innerText);
+                });
+                const complicacoes = [];
+                document.querySelectorAll('input[name="complicacoes"]:checked').forEach((checkbox) => {
+                    complicacoes.push(checkbox.nextElementSibling.innerText);
+                });
 
-            // Adicione mais campos do formulário conforme necessário
-
-            db.collection("visitas").add({
-                dataVisita: dataVisita,
-                nome: nome,
-                dataNascimento: dataNascimento,
-                dataUltimaVisita: dataUltimaVisita,
-                doencas: doencas,
-                complicacoes: complicacoes,
-                // Adicione outros campos aqui
-            })
-            .then(() => {
-                alert("Dados salvos com sucesso!");
-            })
-            .catch((error) => {
-                console.error("Erro ao salvar dados: ", error);
-            });
-        }
+                db.collection("visitas").add({
+                    dataVisita: dataVisita,
+                    nome: nome,
+                    dataNascimento: dataNascimento,
+                    dataUltimaVisita: dataUltimaVisita,
+                    doencas: doencas,
+                    complicacoes: complicacoes,
+                })
+                .then(() => {
+                    alert("Dados salvos com sucesso!");
+                })
+                .catch((error) => {
+                    console.error("Erro ao salvar dados: ", error);
+                });
+            }
+        });
     </script>
 </head>
 <body>
