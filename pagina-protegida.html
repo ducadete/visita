@@ -58,12 +58,14 @@
             padding: 5px;
         }
     </style>
-    <!-- Adicionando o Firebase SDK -->
-   <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js"></script>
+    
+       
+ <!-- Adicionando o Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js"></script>
+    
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
+         const firebaseConfig = {
             apiKey: "AIzaSyCxMQnsd8YvXyn3DH21gAzTjRXfp0gAvhA",
             authDomain: "visita-domiciliar-6866a.firebaseapp.com",
             projectId: "visita-domiciliar-6866a",
@@ -73,10 +75,13 @@
             measurementId: "G-SRCJH2TZ3R"
         };
 
-        // Initialize Firebase
+        // Inicialize o Firebase
         const app = firebase.initializeApp(firebaseConfig);
+
+        // Inicialize o Firestore
         const db = firebase.firestore();
 
+        // Defina sua função saveData aqui
         function saveData() {
             const dataVisita = document.getElementById("data-visita").value;
             const nome = document.getElementById("nome").value;
