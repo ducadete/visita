@@ -310,8 +310,62 @@
 
         <h2>Registro da visita</h2>
         <textarea rows="4" placeholder="Considerar habilidades para o auto-cuidado, conhecimento sobre diabetes e hipertensão, conhecimento sobre medidas preventivas e adesão à medicação atual."></textarea>
+<button type="button" onclick="saveData()">Salvar</button>
 
     </form>
+<!-- Adicione o SDK do Firebase via CDN -->
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js"></script>
+<script>
+  // Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxMQnsd8YvXyn3DH21gAzTjRXfp0gAvhA",
+    authDomain: "visita-domiciliar-6866a.firebaseapp.com",
+    projectId: "visita-domiciliar-6866a",
+    storageBucket: "visita-domiciliar-6866a.appspot.com",
+    messagingSenderId: "1096961063614",
+    appId: "1:1096961063614:web:852bf1c2e8b329c8cd3cef",
+    measurementId: "G-SRCJH2TZ3R"
+  };
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+<script>
+  function saveData() {
+    const dataVisita = document.getElementById("data-visita").value;
+    const nome = document.getElementById("nome").value;
+    const dataNascimento = document.getElementById("data-nascimento").value;
+    const dataUltimaVisita = document.getElementById("data-ultima-visita").value;
+    const doencas = [];
+    document.querySelectorAll('input[name="doencas"]:checked').forEach((checkbox) => {
+      doencas.push(checkbox.nextElementSibling.innerText);
+    });
+    const complicacoes = [];
+    document.querySelectorAll('input[name="complicacoes"]:checked').forEach((checkbox) => {
+      complicacoes.push(checkbox.nextElementSibling.innerText);
+    });
+
+    // Adicione mais campos do formulário conforme necessário
+
+    db.collection("visitas").add({
+      dataVisita: dataVisita,
+      nome: nome,
+      dataNascimento: dataNascimento,
+      dataUltimaVisita: dataUltimaVisita,
+      doencas: doencas,
+      complicacoes: complicacoes,
+      // Adicione outros campos aqui
+    })
+    .then(() => {
+      alert("Dados salvos com sucesso!");
+    })
+    .catch((error) => {
+      console.error("Erro ao salvar dados: ", error);
+    });
+  }
+</script>
 
 </body>
 </html>
