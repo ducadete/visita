@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Saúde</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            margin: 0;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .hidden-text {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .hidden-text input {
+            width: 95%;
+            padding: 5px;
+        }
+    </style>
+    <script>
+        function toggleVisibility(checkbox, textId) {
+            const textElement = document.getElementById(textId);
+            if (checkbox.checked) {
+                textElement.style.display = "block";
+            } else {
+                textElement.style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <form>
+        <label for="data-visita">Data da visita</label>
+        <input type="date" id="data-visita" name="data-visita" value="1979-03-14">
+
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome">
+
+        <label for="data-nascimento">Data de nascimento</label>
+        <input type="date" id="data-nascimento" name="data-nascimento" value="1979-03-14">
+
+        <label for="data-ultima-visita">Data da última visita</label>
+        <input type="date" id="data-ultima-visita" name="data-ultima-visita" value="1979-03-14">
+
+        <h2>Possui alguma doença crônica</h2>
+        <div class="checkbox-group">
+            <input type="checkbox" id="hipertensao" name="doencas">
+            <label for="hipertensao">Hipertensão arterial</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="diabetes" name="doencas">
+            <label for="diabetes">Diabetes mellitus</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="colesterol" name="doencas">
+            <label for="colesterol">Colesterol</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="depressao" name="doencas">
+            <label for="depressao">Depressão</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="asma" name="doencas">
+            <label for="asma">Asma</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="avc" name="doencas">
+            <label for="avc">AVC (Acidente Vascular Cerebral)</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="alzheimer" name="doencas">
+            <label for="alzheimer">Alzheimer</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="drc" name="doencas">
+            <label for="drc">Doença renal crónica (DRC)</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="outras-doencas" name="doencas" onchange="toggleVisibility(this, 'outras-doencas-text')">
+            <label for="outras-doencas">Outras</label>
+        </div>
+        <div id="outras-doencas-text" class="hidden-text">
+            <input type="text" placeholder="Descreva a doença">
+        </div>
+
+        <h2>Presença de Complicações</h2>
+        <div class="checkbox-group">
+            <input type="checkbox" id="infarto" name="complicacoes">
+            <label for="infarto">Infarto Agudo do Miocárdio</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="outras-coronariopatias" name="complicacoes">
+            <label for="outras-coronariopatias">Outras coronariopatias</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="ave" name="complicacoes">
+            <label for="ave">Acidente Vascular Encefálico</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="doenca-renal" name="complicacoes">
+            <label for="doenca-renal">Doença Renal</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="pe-diabetico" name="complicacoes">
+            <label for="pe-diabetico">Pé Diabético</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="amputacao" name="complicacoes">
+            <label for="amputacao">Amputação por Diabetes</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="outras-complicacoes" name="complicacoes" onchange="toggleVisibility(this, 'outras-complicacoes-text')">
+            <label for="outras-complicacoes">Outras</label>
+        </div>
+        <div id="outras-complicacoes-text" class="hidden-text">
+            <input type="text" placeholder="Descreva a complicação">
+        </div>
+
+        <h2>Hábitos de vida</h2>
+        <label>Tabagismo:</label>
+        <input type="radio" id="tabagismo-sim" name="tabagismo" value="sim">
+        <label for="tabagismo-sim">Sim</label>
+        <input type="radio" id="tabagismo-nao" name="tabagismo" value="nao">
+        <label for="tabagismo-nao">Não</label>
+        <input type="number" placeholder="Quantidade de cigarros por dia">
+
+        <label>Consumo de bebidas alcoólicas:</label>
+        <input type="radio" id="alcool-sim" name="alcool" value="sim">
+        <label for="alcool-sim">Sim</label>
+        <input type="radio" id="alcool-nao" name="alcool" value="nao">
+        <label for="alcool-nao">Não</label>
+        <input type="text" placeholder="Frequência da ingestão de álcool">
+
+        <label>Atividade física:</label>
+        <input type="radio" id="atividade-sim" name="atividade-fisica" value="sim">
+        <label for="atividade-sim">Sim</label>
+        <input type="radio" id="atividade-nao" name="atividade-fisica" value="nao">
+        <label for="atividade-nao">Não</label>
+
+        <label for="habitos-alimentares">Hábitos alimentares (relate como se deu sua alimentação no dia da visita):</label>
+        <textarea id="habitos-alimentares" name="habitos-alimentares" rows="4"></textarea>
+
+        <h2>Tratamento</h2>
+        <label>Não medicamentoso:</label>
+        <div class="checkbox-group">
+            <input type="checkbox" id="dieta" name="tratamento">
+            <label for="dieta">Dieta</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="atividade" name="tratamento">
+            <label for="atividade">Atividade física</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="praticas" name="tratamento">
+            <label for="praticas">Práticas integrativas e complementares (acupuntura, fitoterapia, homeopatia)</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="outros-tratamentos" name="tratamento" onchange="toggleVisibility(this, 'outros-tratamentos-text')">
+            <label for="outros-tratamentos">Outros (benzedeira, chás, reiki, etc)</label>
+        </div>
+        <div id="outros-tratamentos-text" class="hidden-text">
+            <input type="text" placeholder="Descreva o tratamento">
+        </div>
+
+        <label>Medicamentoso:</label>
+        <input type="radio" id="medicamento-sim" name="medicamento" value="sim">
+        <label for="medicamento-sim">Sim</label>
+        <input type="radio" id="medicamento-nao" name="medicamento" value="nao">
+        <label for="medicamento-nao">Não</label>
+
+        <label for="medicamentos-em-uso">Medicamentos em uso:</label>
+        <textarea id="medicamentos-em-uso" name="medicamentos-em-uso" rows="4"></textarea>
+
+        <label>Uso de insulina:</label>
+        <input type="radio" id="insulina-sim" name="insulina" value="sim">
+        <label for="insulina-sim">Sim</label>
+        <input type="radio" id="insulina-nao" name="insulina" value="nao">
+        <label for="insulina-nao">Não</label>
+        <input type="radio" id="insulina-nao-aplica" name="insulina" value="nao-aplica">
+        <label for="insulina-nao-aplica">Não aplica</label>
+
+        <label>Tipo da insulina:</label>
+        <div class="checkbox-group">
+            <input type="checkbox" id="nph" name="tipo-insulina">
+            <label for="nph">NPH</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="regular" name="tipo-insulina">
+            <label for="regular">Regular</label>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="outra-insulina" name="tipo-insulina" onchange="toggleVisibility(this, 'outra-insulina-text')">
+            <label for="outra-insulina">Outra</label>
+        </div>
+        <div id="outra-insulina-text" class="hidden-text">
+            <input type="text" placeholder="Descreva a insulina">
+        </div>
+
+        <label for="dosagem-diaria">Dosagem diária (em unidades)</label>
+        <input type="number" id="dosagem-diaria" name="dosagem-diaria">
+
+        <label for="rodizio-local">Faz rodízio do local de aplicação?</label>
+        <input type="radio" id="rodizio-sim" name="rodizio-local" value="sim">
+        <label for="rodizio-sim">Sim</label>
+        <input type="radio" id="rodizio-nao" name="rodizio-local" value="nao">
+        <label for="rodizio-nao">Não</label>
+        <input type="text" placeholder="Como?">
+
+        <label for="quem-aplica">Quem aplica?</label>
+        <textarea id="quem-aplica" name="quem-aplica" rows="2"></textarea>
+
+        <label for="armazenamento-insulina">Como é feito o armazenamento da insulina e insumos?</label>
+        <textarea id="armazenamento-insulina" name="armazenamento-insulina" rows="2"></textarea>
+
+        <label for="descarte-material">Como é feito o descarte do material perfuro cortante?</label>
+        <textarea id="descarte-material" name="descarte-material" rows="2"></textarea>
+
+        <label>Monitorização Glicêmica:</label>
+        <input type="radio" id="monitorizacao-sim" name="monitorizacao" value="sim">
+        <label for="monitorizacao-sim">Sim</label>
+        <input type="radio" id="monitorizacao-nao" name="monitorizacao" value="nao">
+        <label for="monitorizacao-nao">Não</label>
+
+        <label>Situações de hipoglicemia:</label>
+        <input type="radio" id="hipoglicemia-sim" name="hipoglicemia" value="sim">
+        <label for="hipoglicemia-sim">Sim</label>
+        <input type="radio" id="hipoglicemia-nao" name="hipoglicemia" value="nao">
+        <label for="hipoglicemia-nao">Não</label>
+        <input type="number" placeholder="Quantas vezes por semana?">
+
+        <h2>Exame Físico</h2>
+        <label for="pressao-arterial">Pressão Arterial (mmHg):</label>
+        <input type="number" id="pressao-arterial" name="pressao-arterial">
+
+        <label for="peso">Peso (Kg):</label>
+        <input type="number" id="peso" name="peso">
+
+        <label for="altura">Altura (cm):</label>
+        <input type="number" id="altura" name="altura">
+
+        <label for="imc">IMC (P/H²):</label>
+        <input type="text" id="imc" name="imc">
+
+        <label for="classificacao-imc">Classificação do IMC:</label>
+        <input type="text" id="classificacao-imc" name="classificacao-imc">
+
+        <label for="circunferencia-abdominal">Circunferência abdominal (cm):</label>
+        <input type="number" id="circunferencia-abdominal" name="circunferencia-abdominal">
+
+        <label for="glicemia-capilar">Glicemia capilar (mg/dL):</label>
+        <input type="number" id="glicemia-capilar" name="glicemia-capilar">
+        <input type="radio" id="glicemia-jejum" name="glicemia" value="jejum">
+        <label for="glicemia-jejum">Jejum</label>
+        <input type="radio" id="glicemia-pos-prandial" name="glicemia" value="pos-prandial">
+        <label for="glicemia-pos-prandial">Pós prandial</label>
+        <input type="radio" id="glicemia-ao-acaso" name="glicemia" value="ao-acaso">
+        <label for="glicemia-ao-acaso">Ao acaso</label>
+
+        <h2>Exame dos membros inferiores para identificação do pé de risco</h2>
+        <label for="inspecao-pele">Inspeção da pele e dos pés:</label>
+        <textarea id="inspecao-pele" name="inspecao-pele" rows="2"></textarea>
+
+        <label for="palpacao-pulsos">Palpação de pulsos (pedioso e tibial posterior):</label>
+        <textarea id="palpacao-pulsos" name="palpacao-pulsos" rows="2"></textarea>
+
+        <label for="sensibilidade-protetora">Sensibilidade protetora plantar nos diabéticos (teste do monofilamento de 10g):</label>
+        <textarea id="sensibilidade-protetora" name="sensibilidade-protetora" rows="2"></textarea>
+
+        <h2>Registro da visita</h2>
+        <textarea rows="4" placeholder="Considerar habilidades para o auto-cuidado, conhecimento sobre diabetes e hipertensão, conhecimento sobre medidas preventivas e adesão à medicação atual."></textarea>
+
+    </form>
+
+</body>
+</html>
