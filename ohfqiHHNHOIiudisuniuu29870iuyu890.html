@@ -3,363 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtrar Visitas</title>
+    <title>SOAP Form</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-        }
-        h2 {
-            text-align: center;
-            color: red;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="date"], textarea {
-            width: calc(100% - 12px);
-            padding: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 1rem;
-            background-color: #e6e6e6;
-            color: #333;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 5px;
-            font-size: 1rem;
-            border: 1px solid #007bff;
-            border-radius: 3px;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        .menu-container {
-            width: 100%;
-            background-color: #007bff;
-            padding: 10px;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        .menu-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            outline: none;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-        .menu-container:hover .dropdown-content {
-            display: block;
-        }
-        .edit-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 5px 10px;
-            margin: 2px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border-radius: 3px;
-            border: none;
-        }
-        .save-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 5px 10px;
-            margin: 2px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border-radius: 3px;
-            border: none;
-            display: none; /* O botão "Salvar" começa oculto */
-        }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            padding: 5px 10px;
-            margin: 2px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border-radius: 3px;
-            border: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="menu-container">
-        <button class="menu-button">Menu</button>
-        <div class="dropdown-content">
-            <a href="ohfqiHHNHOIiudisuniuu29870iuyu890.html">Cadastrar Visita</a>
-            <a href="ijhgi67989Bbbrsj8K023j.html">Visualizar Visita</a>
-        </div>
-    </div>
-    
-<div class="container">
-    <h2>Filtrar Visitas</h2>
-    
-    <label for="filter-date-start">Data Início:</label>
-    <input type="date" id="filter-date-start" name="filter-date-start">
-
-    <label for="filter-date-end">Data Fim:</label>
-    <input type="date" id="filter-date-end" name="filter-date-end">
-    
-    <label for="filter-professional">Nome do Profissional:</label>
-    <input type="text" id="filter-professional" name="filter-professional">
-
-    <button type="button" id="filter-btn">Filtrar</button>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Nome do Profissional</th>
-                <th>Data da Visita</th>
-                <th>Usuário do Serviço</th>
-                <th>Data Nasc.</th>
-                <th>Subjetivo - Motivo da consulta / Queixa</th>
-                <th>Subjetivo - Observação</th>
-                <th>Avaliação - Problema Detectado</th>
-                <th>Avaliação - Observação</th>
-                <th>Plano - Intervenção</th>
-                <th>Plano - Observação</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody id="visit-records">
-            <!-- Os registros filtrados serão inseridos aqui -->
-        </tbody>
-    </table>
-</div>
-
-<!-- Adicionando Firebase SDK para versão 8.0.0 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
-<script>
-  // Configuração do Firebase
-  var firebaseConfig = {
-    apiKey: "AIzaSyCxMQnsd8YvXyn3DH21gAzTjRXfp0gAvhA",
-    authDomain: "visita-domiciliar-6866a.firebaseapp.com",
-    projectId: "visita-domiciliar-6866a",
-    storageBucket: "visita-domiciliar-6866a.appspot.com",
-    messagingSenderId: "1096961063614",
-    appId: "1:1096961063614:web:852bf1c2e8b329c8cd3cef",
-    measurementId: "G-SRCJH2TZ3R"
-  };
-
-  // Inicializando Firebase
-  firebase.initializeApp(firebaseConfig);
-  var db = firebase.firestore();
-
-  // Função para carregar e filtrar visitas
-  function carregarVisitas() {
-    var filterDateStart = document.getElementById('filter-date-start').value;
-    var filterDateEnd = document.getElementById('filter-date-end').value;
-    var filterProfessional = document.getElementById('filter-professional').value.trim().toLowerCase();
-    var tableBody = document.getElementById('visit-records');
-    
-    // Limpar registros anteriores
-    tableBody.innerHTML = '';
-
-    var query = db.collection("visitas");
-
-    if (filterDateStart && filterDateEnd) {
-      query = query.where("visitDate", ">=", filterDateStart).where("visitDate", "<=", filterDateEnd);
-    } else if (filterDateStart) {
-      query = query.where("visitDate", ">=", filterDateStart);
-    } else if (filterDateEnd) {
-      query = query.where("visitDate", "<=", filterDateEnd);
-    }
-
-    query.get().then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        var data = doc.data();
-
-        // Filtro por nome do profissional
-        if (filterProfessional && !data.professionalName.toLowerCase().includes(filterProfessional)) {
-          return; // Pula este registro se não coincidir com o filtro de nome
-        }
-
-        // Criar uma nova linha na tabela
-        var newRow = `
-          <tr data-id="${doc.id}">
-            <td contenteditable="true" class="editable">${data.professionalName}</td>
-            <td contenteditable="true" class="editable">${data.visitDate}</td>
-            <td contenteditable="true" class="editable">${data.serviceUser}</td>
-            <td contenteditable="true" class="editable">${data.birthDate}</td>
-            <td contenteditable="true" class="editable">${data.subjetivo.consultationReason}</td>
-            <td contenteditable="true" class="editable">${data.subjetivo.observation}</td>
-            <td contenteditable="true" class="editable">${data.avaliacao.assessmentReason}</td>
-            <td contenteditable="true" class="editable">${data.avaliacao.assessmentObservation}</td>
-            <td contenteditable="true" class="editable">${data.plano.planIntervention}</td>
-            <td contenteditable="true" class="editable">${data.plano.planObservation}</td>
-            <td>
-              <button class="edit-btn">Editar</button>
-              <button class="save-btn" style="display: none;">Salvar</button>
-              <button class="delete-btn">Remover</button>
-            </td>
-          </tr>
-        `;
-        tableBody.insertAdjacentHTML('beforeend', newRow);
-      });
-
-      // Adiciona event listeners aos botões de editar e salvar
-      adicionarEventListeners();
-    }).catch((error) => {
-      console.error("Erro ao carregar os dados: ", error);
-    });
-  }
-
-  // Função para adicionar event listeners aos botões de editar e salvar
-  function adicionarEventListeners() {
-    const editButtons = document.querySelectorAll('.edit-btn');
-    const saveButtons = document.querySelectorAll('.save-btn');
-
-    editButtons.forEach((button, index) => {
-      button.addEventListener('click', function() {
-        toggleEditSave(button, saveButtons[index]);
-      });
-    });
-
-    saveButtons.forEach((button, index) => {
-      button.addEventListener('click', function() {
-        salvarEdicao(button, editButtons[index]);
-      });
-    });
-
-    const deleteButtons = document.querySelectorAll('.delete-btn');
-    deleteButtons.forEach((button) => {
-      button.addEventListener('click', function() {
-        removerVisita(button);
-      });
-    });
-  }
-
-  // Função para alternar entre os botões "Editar" e "Salvar"
-  function toggleEditSave(editButton, saveButton) {
-    const row = editButton.closest('tr');
-    const isEditing = row.getAttribute('data-editing') === 'true';
-
-    if (isEditing) {
-      row.removeAttribute('data-editing');
-      saveButton.style.display = 'none';
-      editButton.style.display = 'inline-block';
-    } else {
-      row.setAttribute('data-editing', 'true');
-      saveButton.style.display = 'inline-block';
-      editButton.style.display = 'none';
-    }
-  }
-
-  // Função para salvar a edição no Firebase
-  function salvarEdicao(saveButton, editButton) {
-    const row = saveButton.closest('tr');
-    const docId = row.getAttribute('data-id');
-
-    // Obter os valores das células editáveis
-    const updatedData = {
-      professionalName: row.cells[0].innerText,
-      visitDate: row.cells[1].innerText,
-      serviceUser: row.cells[2].innerText,
-      birthDate: row.cells[3].innerText,
-      subjetivo: {
-        consultationReason: row.cells[4].innerText,
-        observation: row.cells[5].innerText
-      },
-      avaliacao: {
-        assessmentReason: row.cells[6].innerText,
-        assessmentObservation: row.cells[7].innerText
-      },
-      plano: {
-        planIntervention: row.cells[8].innerText,
-        planObservation: row.cells[9].innerText
+      body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5;
       }
+      .container {
+          width: 100%;
+          max-width: 800px;
+          margin: 20px auto;
+          padding: 20px;
+          background-color: white;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+      .section {
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          padding: 20px;
+          margin-bottom: 20px;
+      }
+      h2 {
+          text-align: center;
+          color: red;
+          margin-bottom: 20px;
+          font-size: 1.5rem;
+      }
+      label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: bold;
+      }
+      input[type="text"], input[type="date"], textarea {
+          width: calc(100% - 12px);
+          padding: 8px;
+          margin-bottom: 15px;
+          border: 1px solid #ccc;
+          border-radius: 3px;
+          font-size: 1rem;
+          background-color: #e6e6e6;
+          color: #333;
+      }
+      .row {
+          display: flex;
+          justify-content: space-between;
+      }
+      .row div {
+          width: 48%;
+      }
+      .btn-container {
+          text-align: center;
+          margin-top: 20px;
+      }
+      button {
+          padding: 10px 20px;
+          margin: 5px;
+          font-size: 1rem;
+          border: 1px solid #007bff;
+          border-radius: 3px;
+          background-color: #007bff;
+          color: white;
+          cursor: pointer;
+      }
+      button:hover {
+          background-color: #0056b3;
+      }
+      table {
+          width: 100%;
+          margin-top: 20px;
+          border-collapse: collapse;
+          font-size: 0.9rem;
+      }
+      table, th, td {
+          border: 1px solid #ccc;
+      }
+      th, td {
+          padding: 8px;
+          text-align: left;
+      }
+      .delete-btn {
+          background-color: red;
+          color: white;
+          border: none;
+          padding: 5px 10px;
+          cursor: pointer;
+          border-radius: 3px;
+      }
+      .btn-clear {
+          background-color: #ffc107;
+          color: white;
+      }
+      .menu-container {
+          width: 100%;
+          background-color: #007bff;
+          padding: 10px;
+          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .menu-button {
+          background-color: #007bff;
+          color: white;
+          padding: 10px 20px;
+          font-size: 1.2rem;
+          border: none;
+          cursor: pointer;
+          border-radius: 5px;
+          outline: none;
+      }
+      .dropdown-content {
+          display: none;
+          position: absolute;
+          background-color: #f9f9f9;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+          z-index: 1;
+      }
+      .dropdown-content a {
+          color: black;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+      }
+      .dropdown-content a:hover {
+          background-color: #f1f1f1;
+      }
+      .menu-container:hover .dropdown-content {
+          display: block;
+      }
+  </style>
+  <!-- Adicionando Firebase SDK para versão 8.0.0 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script>
+    // Configuração do Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyCxMQnsd8YvXyn3DH21gAzTjRXfp0gAvhA",
+      authDomain: "visita-domiciliar-6866a.firebaseapp.com",
+      projectId: "visita-domiciliar-6866a",
+      storageBucket: "visita-domiciliar-6866a.appspot.com",
+      messagingSenderId: "1096961063614",
+      appId: "1:1096961063614:web:852bf1c2e8b329c8cd3cef",
+      measurementId: "G-SRCJH2TZ3R"
     };
 
-    // Salvar os dados atualizados no Firebase
-    db.collection("visitas").doc(docId).update(updatedData)
-      .then(() => {
-        alert('Visita atualizada com sucesso!');
-        toggleEditSave(editButton, saveButton); // Voltar para o modo de visualização
-      })
-      .catch((error) => {
-        console.error("Erro ao atualizar visita: ", error);
-      });
+    // Inicializando Firebase
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <div class="menu-container">
+    <button class="menu-button">Menu</button>
+    <div class="dropdown-content">
+        <a href="ohfqiHHNHOIiudisuniuu29870iuyu890.html">Cadastrar Visita</a>
+        <a href="ijhgi67989Bbbrsj8K023j.html">Visualizar Visita</a>
+    </div>
+</div>
+    <div class="container">
+        <!-- Campo Nome do Profissional -->
+        <div class="section">
+            <label for="professional-name">Nome do Profissional:</label>
+            <input type="text" id="professional-name" name="professional-name">
+        </div>
+
+    <!-- Seção SUBJETIVO -->
+    <div class="section">
+        <h2>SUBJETIVO</h2>
+        
+        <label for="visit-date">Data da visita:</label>
+        <input type="date" id="visit-date" name="visit-date">
+        
+        <label for="service-user">Usuário do Serviço:</label>
+        <input type="text" id="service-user" name="service-user">
+        
+        <div class="row">
+            <div>
+                <label for="birth-date">Data Nasc:</label>
+                <input type="date" id="birth-date" name="birth-date">
+            </div>
+            <div>
+                <label for="age">Idade:</label>
+                <input type="text" id="age" name="age" readonly>
+            </div>
+        </div>
+        
+        <label for="consultation-reason">Motivo da consulta / Queixa do Paciente / Entrevista Clínica:</label>
+        <textarea id="consultation-reason" name="consultation-reason" rows="4"></textarea>
+
+        <label for="observation">Observação / Nota:</label>
+        <textarea id="observation" name="observation" rows="2"></textarea>
+        
+        <div class="btn-container">
+            <button type="button" id="save-btn">Salvar</button>
+            <button type="button" id="update-btn">Alterar</button>
+        </div>
+
+        <div class="ciap-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Observação</th>
+                        <th>Motivo</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="records">
+                    <!-- As entradas da tabela serão adicionadas aqui dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Seção AVALIAÇÃO -->
+    <div class="section">
+        <h2>AVALIAÇÃO</h2>
+        
+        <label for="assessment-reason">Problema Detectado / Hipótese Diagnóstica:</label>
+        <textarea id="assessment-reason" name="assessment-reason" rows="4"></textarea>
+
+        <label for="assessment-observation">Observação / Nota:</label>
+        <textarea id="assessment-observation" name="assessment-observation" rows="2"></textarea>
+        
+        <div class="btn-container">
+            <button type="button" id="add-assessment-btn">Incluir</button>
+            <button type="button" id="clear-assessment-btn" class="btn-clear">Limpar</button>
+        </div>
+
+        <div class="ciap-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Observação</th>
+                        <th>Problema</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="assessment-records">
+                    <!-- As entradas da tabela de avaliação serão adicionadas aqui dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Seção PLANO -->
+    <div class="section">
+        <h2>PLANO</h2>
+        
+        <label for="plan-intervention">Intervenção - Procedimento:</label>
+        <textarea id="plan-intervention" name="plan-intervention" rows="4"></textarea>
+
+        <label for="plan-observation">Observação:</label>
+        <textarea id="plan-observation" name="plan-observation" rows="2"></textarea>
+        
+        <div class="btn-container">
+            <button type="button" id="add-plan-btn">Incluir</button>
+            <button type="button" id="clear-plan-btn" class="btn-clear">Limpar</button>
+        </div>
+
+        <div class="ciap-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Observação</th>
+                        <th>Intervenção</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="plan-records">
+                    <!-- As entradas da tabela de plano serão adicionadas aqui dinamicamente -->
+                </tbody>
+            </table>
+            <button type="button" id="save-visit-btn">Salvar Visita</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('birth-date').addEventListener('change', function() {
+    const birthDate = new Date(this.value);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    document.getElementById('age').value = age;
+});
+
+document.getElementById('save-btn').addEventListener('click', function() {
+    const consultationReason = document.getElementById('consultation-reason').value;
+    const observation = document.getElementById('observation').value;
+
+    if (consultationReason && observation) {
+        const newRow = `<tr>
+            <td>${observation}</td>
+            <td>${consultationReason}</td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">Excluir</button></td>
+        </tr>`;
+        document.getElementById('records').insertAdjacentHTML('beforeend', newRow);
+    }
+});
+
+document.getElementById('add-assessment-btn').addEventListener('click', function() {
+    const problem = document.getElementById('assessment-reason').value;
+    const observation = document.getElementById('assessment-observation').value;
+
+    if (problem && observation) {
+        const newRow = `<tr>
+            <td>${observation}</td>
+            <td>${problem}</td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">Excluir</button></td>
+        </tr>`;
+        document.getElementById('assessment-records').insertAdjacentHTML('beforeend', newRow);
+    }
+});
+
+document.getElementById('add-plan-btn').addEventListener('click', function() {
+    const intervention = document.getElementById('plan-intervention').value;
+    const observation = document.getElementById('plan-observation').value;
+
+    if (intervention && observation) {
+        const newRow = `<tr>
+            <td>${observation}</td>
+            <td>${intervention}</td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">Excluir</button></td>
+        </tr>`;
+        document.getElementById('plan-records').insertAdjacentHTML('beforeend', newRow);
+    }
+});
+
+document.getElementById('clear-assessment-btn').addEventListener('click', function() {
+    document.getElementById('assessment-reason').value = '';
+    document.getElementById('assessment-observation').value = '';
+});
+
+document.getElementById('clear-plan-btn').addEventListener('click', function() {
+    document.getElementById('plan-intervention').value = '';
+    document.getElementById('plan-observation').value = '';
+});
+
+function deleteRow(button) {
+    button.closest('tr').remove();
+}
+
+  // Função para salvar dados da visita no Firestore
+  function salvarVisita() {
+    var professionalName = document.getElementById('professional-name').value;
+    var visitDate = document.getElementById('visit-date').value;
+    var serviceUser = document.getElementById('service-user').value;
+    var birthDate = document.getElementById('birth-date').value;
+    var age = document.getElementById('age').value;
+
+    // Subjetivo
+    var consultationReason = document.getElementById('consultation-reason').value;
+    var observation = document.getElementById('observation').value;
+
+    // Avaliação
+    var assessmentReason = document.getElementById('assessment-reason').value;
+    var assessmentObservation = document.getElementById('assessment-observation').value;
+
+    // Plano
+    var planIntervention = document.getElementById('plan-intervention').value;
+    var planObservation = document.getElementById('plan-observation').value;
+
+    db.collection("visitas").add({
+        professionalName: professionalName,
+        visitDate: visitDate,
+        serviceUser: serviceUser,
+        birthDate: birthDate,
+        age: age,
+        subjetivo: {
+            consultationReason: consultationReason,
+            observation: observation
+        },
+        avaliacao: {
+            assessmentReason: assessmentReason,
+            assessmentObservation: assessmentObservation
+        },
+        plano: {
+            planIntervention: planIntervention,
+            planObservation: planObservation
+        },
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        alert("Visita salva com sucesso!");
+    })
+    .catch((error) => {
+        console.error("Erro ao salvar a visita: ", error);
+        alert("Erro ao salvar a visita. Verifique o console para mais informações.");
+    });
   }
 
-  // Função para remover uma visita
-  function removerVisita(button) {
-    const row = button.closest('tr');
-    const docId = row.getAttribute('data-id');
-
-    db.collection("visitas").doc(docId).delete()
-      .then(() => {
-        row.remove();
-        alert('Visita removida com sucesso!');
-      })
-      .catch((error) => {
-        console.error("Erro ao remover visita: ", error);
-      });
-  }
-
-  // Chamar a função para carregar as visitas ao carregar a página
-  window.onload = carregarVisitas;
-
-  // Associar a função ao botão de filtro
-  document.getElementById('filter-btn').addEventListener('click', carregarVisitas);
-
+  // Associar o botão "Salvar Visita" à função salvarVisita
+  document.getElementById('save-visit-btn').addEventListener('click', salvarVisita);
 </script>
 
 </body>
