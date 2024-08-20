@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtrar Visitas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: red;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"], select {
+            width: calc(100% - 12px);
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 1rem;
+            background-color: #e6e6e6;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1rem;
+            border: 1px solid #007bff;
+            border-radius: 3px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .menu-container {
+            width: 100%;
+            background-color: #007bff;
+            padding: 10px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .menu-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            outline: none;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .menu-container:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <button class="menu-button">Menu</button>
+        <div class="dropdown-content">
+            <a href="ohfqiHHNHOIiudisuniuu29870iuyu890.html">Cadastrar Visita</a>
+            <a href="ijhgi67989Bbbrsj8K023j.html">Visualizar Visita</a>
+        </div>
+    </div>
+    
+<div class="container">
+    <h2>Filtrar Visitas</h2>
+    
+    <label for="filter-date">Filtrar por Data:</label>
+    <input type="date" id="filter-date" name="filter-date">
+    
+    <label for="filter-professional">Filtrar por Nome do Profissional:</label>
+    <input type="text" id="filter-professional" name="filter-professional">
+
+    <button type="button" id="filter-btn">Filtrar</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome do Profissional</th>
+                <th>Data da Visita</th>
+                <th>Usuário do Serviço</th>
+                <th>Subjetivo - CIAP2</th>
+                <th>Subjetivo - Observação</th>
+                <th>Avaliação - CIAP2</th>
+                <th>Avaliação - Problema</th>
+                <th>Plano - CIAP2</th>
+                <th>Plano - Intervenção</th>
+            </tr>
+        </thead>
+        <tbody id="visit-records">
+            <!-- Os registros filtrados serão inseridos aqui -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Adicionando Firebase SDK para versão 8.0.0 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+  // Configuração do Firebase
+  var firebaseConfig = {
+    apiKey: "AIzaSyCxMQnsd8YvXyn3DH21gAzTjRXfp0gAvhA",
+    authDomain: "visita-domiciliar-6866a.firebaseapp.com",
+    projectId: "visita-domiciliar-6866a",
+    storageBucket: "visita-domiciliar-6866a.appspot.com",
+    messagingSenderId: "1096961063614",
+    appId: "1:1096961063614:web:852bf1c2e8b329c8cd3cef",
+    measurementId: "G-SRCJH2TZ3R"
+  };
+
+  // Inicializando Firebase
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  // Função para carregar e filtrar visitas
+  function carregarVisitas() {
+    var filterDate = document.getElementById('filter-date').value;
+    var filterProfessional = document.getElementById('filter-professional').value.trim().toLowerCase();
+    var tableBody = document.getElementById('visit-records');
+    
+    // Limpar registros anteriores
+    tableBody.innerHTML = '';
+
+    var query = db.collection("visitas");
+
+    if (filterDate) {
+      query = query.where("visitDate", "==", filterDate);
+    }
+
+    if (filterProfessional) {
+      query = query.where("professionalName", "==", filterProfessional);
+    }
+
+    query.get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        var data = doc.data();
+
+        // Criar uma nova linha na tabela
+        var newRow = `
+          <tr>
+            <td>${data.professionalName}</td>
+            <td>${data.visitDate}</td>
+            <td>${data.serviceUser}</td>
+            <td>${data.subjetivo.ciap2}</td>
+            <td>${data.subjetivo.observation}</td>
+            <td>${data.avaliacao.assessmentCiap2}</td>
+            <td>${data.avaliacao.assessmentReason}</td>
+            <td>${data.plano.planCiap2}</td>
+            <td>${data.plano.planIntervention}</td>
+          </tr>
+        `;
+        tableBody.insertAdjacentHTML('beforeend', newRow);
+      });
+    }).catch((error) => {
+      console.error("Erro ao carregar os dados: ", error);
+    });
+  }
+
+  // Chamar a função para carregar as visitas ao carregar a página
+  window.onload = carregarVisitas;
+
+  // Associar a função ao botão de filtro
+  document.getElementById('filter-btn').addEventListener('click', carregarVisitas);
+
+</script>
+
+</body>
+</html>
