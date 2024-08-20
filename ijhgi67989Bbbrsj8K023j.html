@@ -20,6 +20,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* Adiciona barra de rolagem horizontal se necessário */
         }
         h2 {
             text-align: center;
@@ -56,7 +57,7 @@
             background-color: #0056b3;
         }
         table {
-            width: 100%;
+            width: 100%; /* Garante que a tabela ocupe toda a largura do contêiner */
             margin-top: 20px;
             border-collapse: collapse;
             font-size: 0.9rem;
@@ -104,6 +105,37 @@
         .menu-container:hover .dropdown-content {
             display: block;
         }
+        .edit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            margin: 2px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 3px;
+            border: none;
+        }
+        .save-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            margin: 2px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 3px;
+            border: none;
+            display: none; /* O botão "Salvar" começa oculto */
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            margin: 2px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 3px;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -118,10 +150,13 @@
 <div class="container">
     <h2>Filtrar Visitas</h2>
     
-    <label for="filter-date">Filtrar por Data:</label>
-    <input type="date" id="filter-date" name="filter-date">
+    <label for="filter-date-start">Data Início:</label>
+    <input type="date" id="filter-date-start" name="filter-date-start">
+
+    <label for="filter-date-end">Data Fim:</label>
+    <input type="date" id="filter-date-end" name="filter-date-end">
     
-    <label for="filter-professional">Filtrar por Nome do Profissional:</label>
+    <label for="filter-professional">Nome do Profissional:</label>
     <input type="text" id="filter-professional" name="filter-professional">
 
     <button type="button" id="filter-btn">Filtrar</button>
@@ -138,6 +173,7 @@
                 <th>Avaliação - Problema</th>
                 <th>Plano - CIAP2</th>
                 <th>Plano - Intervenção</th>
+                <th>Ações</th> <!-- Nova coluna para os botões de ação -->
             </tr>
         </thead>
         <tbody id="visit-records">
@@ -168,7 +204,8 @@
 
   // Função para carregar e filtrar visitas
   function carregarVisitas() {
-    var filterDate = document.getElementById('filter-date').value;
+    var filterDateStart = document.getElementById('filter-date-start').value;
+    var filterDateEnd = document.getElementById('filter-date-end').value;
     var filterProfessional = document.getElementById('filter-professional').value.trim().toLowerCase();
     var tableBody = document.getElementById('visit-records');
     
@@ -177,37 +214,141 @@
 
     var query = db.collection("visitas");
 
-    if (filterDate) {
-      query = query.where("visitDate", "==", filterDate);
-    }
-
-    if (filterProfessional) {
-      query = query.where("professionalName", "==", filterProfessional);
+    if (filterDateStart && filterDateEnd) {
+      query = query.where("visitDate", ">=", filterDateStart).where("visitDate", "<=", filterDateEnd);
+    } else if (filterDateStart) {
+      query = query.where("visitDate", ">=", filterDateStart);
+    } else if (filterDateEnd) {
+      query = query.where("visitDate", "<=", filterDateEnd);
     }
 
     query.get().then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
         var data = doc.data();
 
+        // Filtro por nome do profissional
+        if (filterProfessional && !data.professionalName.toLowerCase().includes(filterProfessional)) {
+          return; // Pula este registro se não coincidir com o filtro de nome
+        }
+
         // Criar uma nova linha na tabela
         var newRow = `
-          <tr>
-            <td>${data.professionalName}</td>
-            <td>${data.visitDate}</td>
-            <td>${data.serviceUser}</td>
-            <td>${data.subjetivo.ciap2}</td>
-            <td>${data.subjetivo.observation}</td>
-            <td>${data.avaliacao.assessmentCiap2}</td>
-            <td>${data.avaliacao.assessmentReason}</td>
-            <td>${data.plano.planCiap2}</td>
-            <td>${data.plano.planIntervention}</td>
+          <tr data-id="${doc.id}">
+            <td contenteditable="true" class="editable">${data.professionalName}</td>
+            <td contenteditable="true" class="editable">${data.visitDate}</td>
+            <td contenteditable="true" class="editable">${data.serviceUser}</td>
+            <td contenteditable="true" class="editable">${data.subjetivo.ciap2}</td>
+            <td contenteditable="true" class="editable">${data.subjetivo.observation}</td>
+            <td contenteditable="true" class="editable">${data.avaliacao.assessmentCiap2}</td>
+            <td contenteditable="true" class="editable">${data.avaliacao.assessmentReason}</td>
+            <td contenteditable="true" class="editable">${data.plano.planCiap2}</td>
+            <td contenteditable="true" class="editable">${data.plano.planIntervention}</td>
+            <td>
+              <button class="edit-btn">Editar</button>
+              <button class="save-btn" style="display: none;">Salvar</button>
+              <button class="delete-btn">Remover</button>
+            </td>
           </tr>
         `;
         tableBody.insertAdjacentHTML('beforeend', newRow);
       });
+
+      // Adiciona event listeners aos botões de editar e salvar
+      adicionarEventListeners();
     }).catch((error) => {
       console.error("Erro ao carregar os dados: ", error);
     });
+  }
+
+  // Função para adicionar event listeners aos botões de editar e salvar
+  function adicionarEventListeners() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    const saveButtons = document.querySelectorAll('.save-btn');
+
+    editButtons.forEach((button, index) => {
+      button.addEventListener('click', function() {
+        toggleEditSave(button, saveButtons[index]);
+      });
+    });
+
+    saveButtons.forEach((button, index) => {
+      button.addEventListener('click', function() {
+        salvarEdicao(button, editButtons[index]);
+      });
+    });
+
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    deleteButtons.forEach((button) => {
+      button.addEventListener('click', function() {
+        removerVisita(button);
+      });
+    });
+  }
+
+  // Função para alternar entre os botões "Editar" e "Salvar"
+  function toggleEditSave(editButton, saveButton) {
+    const row = editButton.closest('tr');
+    const isEditing = row.getAttribute('data-editing') === 'true';
+
+    if (isEditing) {
+      row.removeAttribute('data-editing');
+      saveButton.style.display = 'none';
+      editButton.style.display = 'inline-block';
+    } else {
+      row.setAttribute('data-editing', 'true');
+      saveButton.style.display = 'inline-block';
+      editButton.style.display = 'none';
+    }
+  }
+
+  // Função para salvar a edição no Firebase
+  function salvarEdicao(saveButton, editButton) {
+    const row = saveButton.closest('tr');
+    const docId = row.getAttribute('data-id');
+
+    // Obter os valores das células editáveis
+    const updatedData = {
+      professionalName: row.cells[0].innerText,
+      visitDate: row.cells[1].innerText,
+      serviceUser: row.cells[2].innerText,
+      subjetivo: {
+        ciap2: row.cells[3].innerText,
+        observation: row.cells[4].innerText
+      },
+      avaliacao: {
+        assessmentCiap2: row.cells[5].innerText,
+        assessmentReason: row.cells[6].innerText
+      },
+      plano: {
+        planCiap2: row.cells[7].innerText,
+        planIntervention: row.cells[8].innerText
+      }
+    };
+
+    // Salvar os dados atualizados no Firebase
+    db.collection("visitas").doc(docId).update(updatedData)
+      .then(() => {
+        alert('Visita atualizada com sucesso!');
+        toggleEditSave(editButton, saveButton); // Voltar para o modo de visualização
+      })
+      .catch((error) => {
+        console.error("Erro ao atualizar visita: ", error);
+      });
+  }
+
+  // Função para remover uma visita
+  function removerVisita(button) {
+    const row = button.closest('tr');
+    const docId = row.getAttribute('data-id');
+
+    db.collection("visitas").doc(docId).delete()
+      .then(() => {
+        row.remove();
+        alert('Visita removida com sucesso!');
+      })
+      .catch((error) => {
+        console.error("Erro ao remover visita: ", error);
+      });
   }
 
   // Chamar a função para carregar as visitas ao carregar a página
