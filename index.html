@@ -1,0 +1,437 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registro de Visita Domiciliar — SOAP e‑SUS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --brand: #0ea5e9; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    .tab-active { border-bottom: 3px solid var(--brand); color: var(--brand); font-weight: 700; }
+    .mic-btn.active { outline: 2px dashed var(--brand); outline-offset: 2px; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    dialog[open] { animation: pop .15s ease-out; }
+    @keyframes pop { from { transform: scale(.98); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-sky-500/10 grid place-items-center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold">Registro de Visita Domiciliar — SOAP (e‑SUS)</h1>
+          <p class="text-sm text-slate-500">Registro aberto; visualização completa exige login (e‑mail/senha)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnOpenLogin" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white text-sm hover:bg-sky-700">Entrar</button>
+        <button id="btnLogout" class="hidden px-3 py-1.5 rounded-lg bg-slate-200 text-slate-800 text-sm hover:bg-slate-300">Sair</button>
+        <span id="userBadge" class="text-sm text-slate-600"></span>
+      </div>
+    </div>
+    <nav class="max-w-5xl mx-auto px-4">
+      <ul class="flex gap-6 border-b border-slate-200">
+        <li><button data-tab="tab-registro" class="tab-btn tab-active py-3">Registro de Visita</button></li>
+        <li><button data-tab="tab-visitas" class="tab-btn py-3">Visitas Realizadas</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 pt-6 pb-24">
+    <!-- Banner de aviso quando não logado -->
+    <div id="bannerAnon" class="hidden mb-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3" role="alert">
+      <strong class="font-semibold">Atenção:</strong> você não está logado. Os registros podem ser <em>salvos localmente</em>,
+      mas para <strong>gravar no Firebase</strong> e listar em “Visitas Realizadas”, faça login.
+    </div>
+
+    <!-- TAB: REGISTRO (permite digitação; alerta se não logado) -->
+    <section id="tab-registro" class="tab-section">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6">
+        <h2 class="text-lg font-semibold mb-4">Registro SOAP</h2>
+
+        <form id="formRegistro" class="grid md:grid-cols-2 gap-4">
+          <div class="md:col-span-2 grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Usuário do Serviço</label>
+              <input id="inpNome" type="text" required class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="Nome completo" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Data Nasc.</label>
+              <input id="inpNasc" type="date" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Profissional de atendimento</label>
+              <input id="inpProf" type="text" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="Ex.: Enfermeira Fernanda, Dr. Gabriel..." />
+            </div>
+          </div>
+
+          <div class="md:col-span-2 grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">Data da Visita</label>
+              <input id="inpDataVisita" type="date" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Identificador (opcional)</label>
+              <input id="inpIdOpcional" type="text" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="Cartão SUS / Prontuário / RG" />
+            </div>
+          </div>
+
+          <!-- S -->
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold mb-1">S — Motivo / Queixa / Entrevista Clínica</label>
+              <button type="button" class="mic-btn text-slate-500 hover:text-slate-800 flex items-center gap-1" data-target="txtS" title="Ditado por voz">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 1-6 0V7m6 0v5a3 3 0 0 0 6 0V1"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span class="text-xs">ditar</span>
+              </button>
+            </div>
+            <textarea id="txtS" rows="4" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="Relato do usuário, contexto da visita, queixa principal..."></textarea>
+          </div>
+
+          <!-- O -->
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold mb-1">O — Objetivo</label>
+              <button type="button" class="mic-btn text-slate-500 hover:text-slate-800 flex items-center gap-1" data-target="txtO" title="Ditado por voz">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 1-6 0V7m6 0v5a3 3 0 0 0 6 0V1"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span class="text-xs">ditar</span>
+              </button>
+            </div>
+            <textarea id="txtO" rows="3" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="Objetivo(s) da visita/atendimento..."></textarea>
+          </div>
+
+          <!-- A -->
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold mb-1">A — Avaliação (Problema detectado / Hipótese diagnóstica)</label>
+              <button type="button" class="mic-btn text-slate-500 hover:text-slate-800 flex items-center gap-1" data-target="txtA" title="Ditado por voz">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 1-6 0V7m6 0v5a 3 3 0 0 0 6 0V1"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span class="text-xs">ditar</span>
+              </button>
+            </div>
+            <textarea id="txtA" rows="4" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="Problemas identificados, sinais observados, hipóteses..."></textarea>
+          </div>
+
+          <!-- P -->
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold mb-1">P — Plano (Intervenção / Procedimento)</label>
+              <button type="button" class="mic-btn text-slate-500 hover:text-slate-800 flex items-center gap-1" data-target="txtP" title="Ditado por voz">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v11a3 3 0 0 1-6 0V7m6 0v5a3 3 0 0 0 6 0V1"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span class="text-xs">ditar</span>
+              </button>
+            </div>
+            <textarea id="txtP" rows="4" class="needs-login w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="Condutas, encaminhamentos, procedimentos, orientações..."></textarea>
+          </div>
+
+          <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
+            <button id="btnSalvarLocal" type="button" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300">Salvar na página</button>
+            <button id="btnGravarFirebase" type="button" class="px-4 py-2 rounded-xl bg-sky-600 text-white hover:bg-sky-700">Gravar no Firebase</button>
+            <span id="statusMsg" class="text-sm text-slate-500"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="mt-6">
+        <h3 class="font-semibold mb-2">Pré‑visualização (não sincronizada)</h3>
+        <div id="previewLocal" class="grid gap-3"></div>
+      </div>
+    </section>
+
+    <!-- TAB: VISITAS (exige login) -->
+    <section id="tab-visitas" class="tab-section hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6">
+        <div id="loginGate" class="text-center py-10">
+          <p class="text-slate-600 mb-4">Para visualizar as visitas realizadas, entre com e‑mail e senha.</p>
+          <button id="btnOpenLoginGate" class="px-4 py-2 rounded-xl bg-sky-600 text-white hover:bg-sky-700">Entrar</button>
+        </div>
+
+        <div id="visitasArea" class="hidden">
+          <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+            <input id="searchInput" type="search" placeholder="Pesquisar por paciente ou profissional..." class="flex-1 rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" />
+            <label class="flex items-center gap-2 text-sm text-slate-700 select-none">
+              <input id="chkSomenteMinhas" type="checkbox" class="rounded" /> Somente minhas
+            </label>
+            <button id="btnReload" class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300">Recarregar</button>
+          </div>
+          <div id="cardsContainer" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Detalhe -->
+  <dialog id="detailModal" class="rounded-2xl p-0 w-full max-w-2xl">
+    <div class="p-5 md:p-6">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <h3 id="modalTitle" class="text-lg font-semibold"></h3>
+          <p id="modalSub" class="text-sm text-slate-500"></p>
+        </div>
+        <button id="closeModal" class="p-2 hover:bg-slate-100 rounded-lg" title="Fechar">✕</button>
+      </div>
+      <div id="modalBody" class="prose prose-sm max-w-none"></div>
+    </div>
+  </dialog>
+
+  <!-- Modal Login / Registro -->
+  <dialog id="authModal" class="rounded-2xl p-0 w-full max-w-md">
+    <div class="p-5 md:p-6">
+      <div class="flex items-start justify-between mb-3">
+        <h3 class="text-lg font-semibold">Acesso</h3>
+        <button id="closeAuth" class="p-2 hover:bg-slate-100 rounded-lg">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <label class="block text-sm font-medium">E‑mail</label>
+        <input id="authEmail" type="email" class="w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="usuario@exemplo.com">
+        <label class="block text-sm font-medium">Senha</label>
+        <input id="authPass" type="password" class="w-full rounded-lg border-slate-300 focus:border-sky-500 focus:ring-sky-500" placeholder="••••••">
+        <div class="flex gap-2 pt-2">
+          <button id="btnDoLogin" class="px-4 py-2 rounded-xl bg-sky-600 text-white hover:bg-sky-700">Entrar</button>
+          <button id="btnDoRegister" class="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">Registrar</button>
+          <button id="btnReset" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300">Esqueci a senha</button>
+        </div>
+        <p id="authMsg" class="text-sm text-slate-600"></p>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Firebase v10 (modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    // ===== Firebase Config (seu projeto) =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyAsYsjiEno6gbK7MHMBgNTmBlM_hm0RqH0",
+      authDomain: "minhavd-23949.firebaseapp.com",
+      projectId: "minhavd-23949",
+      storageBucket: "minhavd-23949.firebasestorage.app",
+      messagingSenderId: "1063202095707",
+      appId: "1:1063202095707:web:cfdc22246b2ae8d306757e",
+      measurementId: "G-VLLCTV2V89"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const qs = (sel) => document.querySelector(sel);
+    const qsa = (sel) => Array.from(document.querySelectorAll(sel));
+
+    function fmtDateBR(d) {
+      if (!d) return "";
+      try { const dt = (d instanceof Date) ? d : new Date(d); return dt.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }); } catch { return ""; }
+    }
+    function val(id) { return qs('#' + id).value.trim(); }
+    function toast(msg, ok=true){ const el = qs('#statusMsg'); el.textContent = msg; el.className = `text-sm ${ok ? 'text-emerald-600' : 'text-rose-600'}`; setTimeout(()=>{ el.textContent=''; el.className='text-sm text-slate-500'; }, 3500); }
+
+    // ===== Tabs =====
+    qsa('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        qsa('.tab-btn').forEach(b=>b.classList.remove('tab-active'));
+        btn.classList.add('tab-active');
+        const tab = btn.dataset.tab;
+        qsa('.tab-section').forEach(sec => sec.classList.add('hidden'));
+        qs('#' + tab).classList.remove('hidden');
+      });
+    });
+
+    // ===== Mic (Web Speech API) =====
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let rec = null, recTarget = null;
+    function setupMicButtons(){
+      if (!SpeechRecognition) { qsa('.mic-btn').forEach(b=>{ b.disabled = true; b.title = 'Navegador sem suporte a ditado'; }); return; }
+      rec = new SpeechRecognition(); rec.lang = 'pt-BR'; rec.interimResults = true; rec.continuous = false;
+      rec.onresult = (e) => { const t = Array.from(e.results).map(r=>r[0].transcript).join(' '); if (recTarget) recTarget.value = t; };
+      rec.onend = ()=>{ qsa('.mic-btn').forEach(b=>b.classList.remove('active')); };
+      qsa('.mic-btn').forEach(btn=>{ btn.addEventListener('click', ()=>{ recTarget = qs('#' + btn.dataset.target); qsa('.mic-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); try { rec.start(); } catch {} }); });
+    }
+    setupMicButtons();
+
+    // ===== Form defaults =====
+    const todayISO = new Date().toISOString().slice(0,10);
+    qs('#inpDataVisita').value = todayISO;
+
+    // ===== Banner de aviso e interceptação de digitação sem login =====
+    let isLogged = false;
+    const bannerAnon = qs('#bannerAnon');
+    function showAnonBanner(){ bannerAnon.classList.remove('hidden'); }
+    function hideAnonBanner(){ bannerAnon.classList.add('hidden'); }
+    qsa('.needs-login').forEach(el => { ['focus','input','keydown'].forEach(evt => el.addEventListener(evt, ()=>{ if (!isLogged) showAnonBanner(); })); });
+
+    // ===== Pré-visualização local =====
+    qs('#btnSalvarLocal').addEventListener('click', ()=>{
+      const data = coletaDadosFormulario();
+      const box = document.createElement('div');
+      box.className = 'rounded-xl border border-slate-200 bg-white p-4';
+      box.innerHTML = renderCardHTML(data);
+      qs('#previewLocal').prepend(box);
+      toast('Registro salvo localmente (não sincronizado)');
+    });
+
+    function coletaDadosFormulario(){
+      const dataVisita = qs('#inpDataVisita').value || todayISO;
+      return { nome: val('inpNome'), nasc: qs('#inpNasc').value || '', profissional: val('inpProf'), dataVisita, idOpcional: val('inpIdOpcional'), S: val('txtS'), O: val('txtO'), A: val('txtA'), P: val('txtP') };
+    }
+
+    function renderCardHTML(v){
+      const resumo = (v.S || '').slice(0,120);
+      return `<div class="flex items-start justify-between gap-3"><div><div class="text-xs text-slate-500">${fmtDateBR(v.dataVisita)}</div><div class="font-semibold">${escapeHtml(v.nome || '—')}</div><div class="text-sm text-slate-600">Prof.: ${escapeHtml(v.profissional || '—')}</div><div class="text-sm text-slate-500 line-clamp-2 mt-1">${escapeHtml(resumo)}</div></div></div>`;
+    }
+    function escapeHtml(str=''){ return str.replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[m])); }
+
+    // ===== Firebase: gravação (bloqueia se não logado) =====
+    const btnGravarFirebase = qs('#btnGravarFirebase');
+    btnGravarFirebase.addEventListener('click', async ()=>{
+      if (!isLogged) { openAuth(); toast('Entre para gravar no Firebase.', false); return; }
+      const v = coletaDadosFormulario(); if (!v.nome) { toast('Informe o nome do usuário do serviço.', false); return; }
+      try {
+        await addDoc(collection(db, 'visitas'), {
+          ...v,
+          nasc: v.nasc || null,
+          uid: auth.currentUser.uid,      // << grava o usuário responsável
+          createdAt: serverTimestamp()
+        });
+        toast('Gravado no Firebase com sucesso.');
+        ['txtS','txtO','txtA','txtP'].forEach(id=>{ qs('#'+id).value=''; });
+      } catch (e) { console.error(e); toast('Falha ao gravar: ' + (e.code || e.message), false); }
+    });
+
+    // ===== Auth (email/senha) =====
+    const userBadge = qs('#userBadge');
+    const btnLogout = qs('#btnLogout');
+    const btnOpenLogin = qs('#btnOpenLogin');
+    const btnOpenLoginGate = qs('#btnOpenLoginGate');
+
+    const authModal = qs('#authModal');
+    const closeAuth = qs('#closeAuth');
+    const authEmail = qs('#authEmail');
+    const authPass = qs('#authPass');
+    const btnDoLogin = qs('#btnDoLogin');
+    const btnDoRegister = qs('#btnDoRegister');
+    const btnReset = qs('#btnReset');
+    const authMsg = qs('#authMsg');
+
+    function openAuth(){ authMsg.textContent=''; authModal.showModal(); }
+    function closeAuthModal(){ authModal.close(); }
+
+    btnOpenLogin.addEventListener('click', openAuth);
+    if (btnOpenLoginGate) btnOpenLoginGate.addEventListener('click', openAuth);
+    closeAuth.addEventListener('click', closeAuthModal);
+
+    btnDoLogin.addEventListener('click', async ()=>{
+      try { await signInWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value.trim()); closeAuthModal(); }
+      catch (e) { authMsg.textContent = traduzErro(e.code); }
+    });
+    btnDoRegister.addEventListener('click', async ()=>{
+      try { await createUserWithEmailAndPassword(auth, authEmail.value.trim(), authPass.value.trim()); authMsg.textContent = 'Usuário criado. Você já está logado.'; setTimeout(()=> closeAuthModal(), 900); }
+      catch (e) { authMsg.textContent = traduzErro(e.code); }
+    });
+    btnReset.addEventListener('click', async ()=>{
+      try { await sendPasswordResetEmail(auth, authEmail.value.trim()); authMsg.textContent = 'E‑mail de redefinição enviado.'; }
+      catch (e) { authMsg.textContent = traduzErro(e.code); }
+    });
+    btnLogout.addEventListener('click', async ()=>{ await signOut(auth); });
+
+    onAuthStateChanged(auth, (user)=>{
+      isLogged = !!user;
+      btnLogout.classList.toggle('hidden', !isLogged);
+      btnOpenLogin.classList.toggle('hidden', isLogged);
+      userBadge.textContent = isLogged ? (user.email || 'Usuário') : '';
+      // Exibição da aba Visitas
+      qs('#loginGate').classList.toggle('hidden', isLogged);
+      qs('#visitasArea').classList.toggle('hidden', !isLogged);
+      // Banner de aviso
+      if (isLogged) hideAnonBanner(); else showAnonBanner();
+      if (isLogged) loadVisitas();
+    });
+
+    function traduzErro(code){
+      switch(code){
+        case 'auth/invalid-email': return 'E‑mail inválido';
+        case 'auth/user-not-found':
+        case 'auth/wrong-password': return 'Usuário ou senha incorretos';
+        case 'auth/weak-password': return 'Senha muito fraca (mínimo 6 caracteres)';
+        case 'auth/email-already-in-use': return 'E‑mail já em uso';
+        default: return 'Erro de autenticação';
+      }
+    }
+
+    // ===== Listagem e busca =====
+    const cardsContainer = qs('#cardsContainer');
+    const chkSomenteMinhas = qs('#chkSomenteMinhas');
+    let cacheVisitas = [];
+
+    async function loadVisitas(){
+      try {
+        cardsContainer.innerHTML = '<div class="py-6 text-center text-slate-500">Carregando...</div>';
+        const qRef = query(collection(db, 'visitas'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(qRef);
+        cacheVisitas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCards(applyFilters(cacheVisitas));
+      } catch (e) {
+        console.error(e);
+        cardsContainer.innerHTML = '<div class="py-6 text-center text-rose-600">Falha ao carregar visitas.</div>';
+      }
+    }
+
+    function applyFilters(list){
+      let arr = [...list];
+      // filtro texto
+      const t = (qs('#searchInput')?.value || '').toLowerCase();
+      if (t) arr = arr.filter(v => (v.nome||'').toLowerCase().includes(t) || (v.profissional||'').toLowerCase().includes(t) || (v.S||'').toLowerCase().includes(t));
+      // filtro somente minhas (client‑side para evitar precisar de índice composto)
+      if (chkSomenteMinhas?.checked && auth.currentUser) arr = arr.filter(v => v.uid === auth.currentUser.uid);
+      return arr;
+    }
+
+    function renderCards(list){
+      if (!list.length){ cardsContainer.innerHTML = '<div class="py-6 text-center text-slate-500">Sem registros.</div>'; return; }
+      cardsContainer.innerHTML = '';
+      list.forEach(v => {
+        const card = document.createElement('button');
+        card.className = 'text-left rounded-2xl border border-slate-200 bg-white p-4 hover:shadow';
+        card.innerHTML = `<div class=\"text-xs text-slate-500\">${fmtDateBR(v.dataVisita)}</div><div class=\"font-semibold\">${escapeHtml(v.nome || '—')}</div><div class=\"text-sm text-slate-600\">Prof.: ${escapeHtml(v.profissional || '—')}</div><div class=\"text-sm text-slate-500 line-clamp-2 mt-1\">${escapeHtml((v.S||'').slice(0,120))}</div>`;
+        card.addEventListener('click', ()=> openDetail(v));
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    qs('#btnReload')?.addEventListener('click', loadVisitas);
+    qs('#searchInput')?.addEventListener('input', ()=> renderCards(applyFilters(cacheVisitas)) );
+    chkSomenteMinhas?.addEventListener('change', ()=> renderCards(applyFilters(cacheVisitas)) );
+
+    // ===== Modal Detalhe =====
+    const modal = qs('#detailModal');
+    const closeModal = qs('#closeModal');
+    function openDetail(v){
+      qs('#modalTitle').textContent = v.nome || '—';
+      qs('#modalSub').textContent = `${fmtDateBR(v.dataVisita)} • Prof.: ${v.profissional||'—'}`;
+      qs('#modalBody').innerHTML = `
+        <div class="grid gap-3">
+          ${v.idOpcional ? `<div><strong>Identificador:</strong> ${escapeHtml(v.idOpcional)}</div>`:''}
+          ${v.nasc ? `<div><strong>Data Nasc.:</strong> ${fmtDateBR(v.nasc)}</div>`:''}
+          ${section('S — Motivo / Queixa / Entrevista Clínica', v.S)}
+          ${section('O — Objetivo', v.O)}
+          ${section('A — Avaliação', v.A)}
+          ${section('P — Plano', v.P)}
+        </div>`;
+      modal.showModal();
+    }
+    function section(title, text){ if (!text) return ''; return `<div><div class="font-semibold mb-1">${title}</div><div class="whitespace-pre-wrap">${escapeHtml(text)}</div></div>`; }
+    closeModal.addEventListener('click', ()=> modal.close());
+    modal.addEventListener('click', (e)=>{ if (e.target === modal) modal.close(); });
+
+  </script>
+</body>
+</html>
